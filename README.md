@@ -23,6 +23,80 @@ Validation checks the generated structure and layout; it does not judge the desc
 - **Automatic retry**: Retries invalid JSON with corrective feedback
 - **GPU memory management**: Uses LLM Text Processor to release inference resources before image generation
 
+## Example
+
+### Original prompt
+
+> beach, woman playing with dog, fisherboat in the distant, windy, blue hour, 35 mm photo
+
+### Structured JSON output
+
+The editable `DRAFT_JSON` output describes the scene and places each subject using absolute pixel coordinates. This example uses a **1920 x 1088** canvas.
+
+```json
+{
+  "width": 1920,
+  "height": 1088,
+  "bbox_coord_space": "abs",
+  "bbox_format": "xyxy",
+  "summary": {
+    "caption": "A candid 35mm film photograph capturing a dynamic moment on a beach during the blue hour. In the foreground left, a woman in a light windbreaker laughs while interacting with a golden retriever that is leaping mid-air towards her. The wind is visibly strong, blowing their hair and the dog's fur to the right. The background features a calm ocean stretching to the horizon, where a small, dark silhouette of a fisherboat sits in the distance. The scene is bathed in cool blue ambient light with visible film grain.",
+    "meta": [
+      "35mm photography",
+      "blue hour",
+      "beach",
+      "windy",
+      "candid"
+    ],
+    "canvas": "single"
+  },
+  "items": [
+    {
+      "label": "character",
+      "caption": "A woman with shoulder-length brown hair blown sharply to the right by the wind, wearing a light beige windbreaker and dark trousers. She is positioned on the wet sand in the left foreground, leaning slightly forward with her arms extended toward the dog, laughing with an open-mouthed expression. Her posture suggests active engagement, with one foot planted firmly and the other slightly lifted.",
+      "bbox": [
+        150,
+        350,
+        650,
+        1050
+      ]
+    },
+    {
+      "label": "character",
+      "caption": "A golden retriever captured mid-leap in the air, body angled upward and toward the woman. Its fur is ruffled by the wind, flowing to the right. The dog's front paws are extended forward as if reaching for a treat or toy held by the woman, while its hind legs are tucked slightly back. The expression is alert and playful.",
+      "bbox": [
+        450,
+        400,
+        950,
+        850
+      ]
+    },
+    {
+      "label": "object",
+      "caption": "A small, dark silhouette of a traditional fisherboat floating on the calm ocean surface in the far distance. It is positioned near the horizon line, appearing as a simple, elongated shape with a faint mast, barely distinguishable from the twilight water.",
+      "bbox": [
+        1400,
+        580,
+        1600,
+        620
+      ]
+    }
+  ]
+}
+```
+
+### Enhanced prompt (compiled output)
+
+The `RESPONSE` output is the compiled MOSS-ready prompt. Connect it to MOSS Text Encode and use the same **1920 x 1088** canvas dimensions. The compiler converts the draft boxes into centered `yxyx` coordinates.
+
+```json
+{"summary":{"caption":"A candid 35mm film photograph capturing a dynamic moment on a beach during the blue hour. In the foreground left, a woman in a light windbreaker laughs while interacting with a golden retriever that is leaping mid-air towards her. The wind is visibly strong, blowing their hair and the dog's fur to the right. The background features a calm ocean stretching to the horizon, where a small, dark silhouette of a fisherboat sits in the distance. The scene is bathed in cool blue ambient light with visible film grain.","meta":["35mm photography","blue hour","beach","windy","candid"],"canvas":"single"},"items":[{"label":"character","caption":"A woman with shoulder-length brown hair blown sharply to the right by the wind, wearing a light beige windbreaker and dark trousers. She is positioned on the wet sand in the left foreground, leaning slightly forward with her arms extended toward the dog, laughing with an open-mouthed expression. Her posture suggests active engagement, with one foot planted firmly and the other slightly lifted.","bbox":[-194,-810,506,-310]},{"label":"character","caption":"A golden retriever captured mid-leap in the air, body angled upward and toward the woman. Its fur is ruffled by the wind, flowing to the right. The dog's front paws are extended forward as if reaching for a treat or toy held by the woman, while its hind legs are tucked slightly back. The expression is alert and playful.","bbox":[-144,-510,306,-10]},{"label":"object","caption":"A small, dark silhouette of a traditional fisherboat floating on the calm ocean surface in the far distance. It is positioned near the horizon line, appearing as a simple, elongated shape with a faint mast, barely distinguishable from the twilight water.","bbox":[36,440,76,640]}],"bbox_coord_space":"abs_centralized","bbox_format":"yxyx"}
+```
+
+### Resulting image
+
+![A woman playing with a leaping golden retriever on a windy beach at blue hour, with a fishing boat in the distance](assets/beach-example.png)
+
 ## Installation
 
 1. Clone or download this repository to your ComfyUI custom_nodes directory:
@@ -90,80 +164,6 @@ Image input requires a vision model with a matching `mmproj` file. Text-only use
 5. Connect the `RESPONSE` output to `MOSS Text Encode`
 6. Connect the `WIDTH` and `HEIGHT` outputs to your latent generation node
 7. Run the workflow
-
-### Example
-
-#### Original prompt
-
-> beach, woman playing with dog, fisherboat in the distant, windy, blue hour, 35 mm photo
-
-#### Structured JSON output
-
-The editable `DRAFT_JSON` output describes the scene and places each subject using absolute pixel coordinates. This example uses a **1920 x 1088** canvas.
-
-```json
-{
-  "width": 1920,
-  "height": 1088,
-  "bbox_coord_space": "abs",
-  "bbox_format": "xyxy",
-  "summary": {
-    "caption": "A candid 35mm film photograph capturing a dynamic moment on a beach during the blue hour. In the foreground left, a woman in a light windbreaker laughs while interacting with a golden retriever that is leaping mid-air towards her. The wind is visibly strong, blowing their hair and the dog's fur to the right. The background features a calm ocean stretching to the horizon, where a small, dark silhouette of a fisherboat sits in the distance. The scene is bathed in cool blue ambient light with visible film grain.",
-    "meta": [
-      "35mm photography",
-      "blue hour",
-      "beach",
-      "windy",
-      "candid"
-    ],
-    "canvas": "single"
-  },
-  "items": [
-    {
-      "label": "character",
-      "caption": "A woman with shoulder-length brown hair blown sharply to the right by the wind, wearing a light beige windbreaker and dark trousers. She is positioned on the wet sand in the left foreground, leaning slightly forward with her arms extended toward the dog, laughing with an open-mouthed expression. Her posture suggests active engagement, with one foot planted firmly and the other slightly lifted.",
-      "bbox": [
-        150,
-        350,
-        650,
-        1050
-      ]
-    },
-    {
-      "label": "character",
-      "caption": "A golden retriever captured mid-leap in the air, body angled upward and toward the woman. Its fur is ruffled by the wind, flowing to the right. The dog's front paws are extended forward as if reaching for a treat or toy held by the woman, while its hind legs are tucked slightly back. The expression is alert and playful.",
-      "bbox": [
-        450,
-        400,
-        950,
-        850
-      ]
-    },
-    {
-      "label": "object",
-      "caption": "A small, dark silhouette of a traditional fisherboat floating on the calm ocean surface in the far distance. It is positioned near the horizon line, appearing as a simple, elongated shape with a faint mast, barely distinguishable from the twilight water.",
-      "bbox": [
-        1400,
-        580,
-        1600,
-        620
-      ]
-    }
-  ]
-}
-```
-
-#### Enhanced prompt (compiled output)
-
-The `RESPONSE` output is the compiled MOSS-ready prompt. Connect it to MOSS Text Encode and use the same **1920 x 1088** canvas dimensions. The compiler converts the draft boxes into centered `yxyx` coordinates.
-
-```json
-{"summary":{"caption":"A candid 35mm film photograph capturing a dynamic moment on a beach during the blue hour. In the foreground left, a woman in a light windbreaker laughs while interacting with a golden retriever that is leaping mid-air towards her. The wind is visibly strong, blowing their hair and the dog's fur to the right. The background features a calm ocean stretching to the horizon, where a small, dark silhouette of a fisherboat sits in the distance. The scene is bathed in cool blue ambient light with visible film grain.","meta":["35mm photography","blue hour","beach","windy","candid"],"canvas":"single"},"items":[{"label":"character","caption":"A woman with shoulder-length brown hair blown sharply to the right by the wind, wearing a light beige windbreaker and dark trousers. She is positioned on the wet sand in the left foreground, leaning slightly forward with her arms extended toward the dog, laughing with an open-mouthed expression. Her posture suggests active engagement, with one foot planted firmly and the other slightly lifted.","bbox":[-194,-810,506,-310]},{"label":"character","caption":"A golden retriever captured mid-leap in the air, body angled upward and toward the woman. Its fur is ruffled by the wind, flowing to the right. The dog's front paws are extended forward as if reaching for a treat or toy held by the woman, while its hind legs are tucked slightly back. The expression is alert and playful.","bbox":[-144,-510,306,-10]},{"label":"object","caption":"A small, dark silhouette of a traditional fisherboat floating on the calm ocean surface in the far distance. It is positioned near the horizon line, appearing as a simple, elongated shape with a faint mast, barely distinguishable from the twilight water.","bbox":[36,440,76,640]}],"bbox_coord_space":"abs_centralized","bbox_format":"yxyx"}
-```
-
-#### Resulting image
-
-![A woman playing with a leaping golden retriever on a windy beach at blue hour, with a fishing boat in the distance](assets/beach-example.png)
 
 ## How It Works
 
