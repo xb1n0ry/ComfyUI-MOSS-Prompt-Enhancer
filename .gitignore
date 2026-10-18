@@ -1,0 +1,31 @@
+# Python and test output
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# Local environments, credentials, and editor files
+.venv/
+venv/
+.env
+.env.*
+!.env.example
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Build output and temporary backups
+build/
+dist/
+*.egg-info/
+*.current
+*.bak
+*.log
+
+# Models belong in ComfyUI's model folders
+*.gguf
+*.safetensors
