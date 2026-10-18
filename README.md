@@ -93,55 +93,77 @@ Image input requires a vision model with a matching `mmproj` file. Text-only use
 
 ### Example
 
-The following is an illustrative example. Actual wording and layout will vary with the selected model.
-
 #### Original prompt
 
-> A woman in a blue dress standing in a garden.
-
-#### Enhanced prompt
-
-> A woman in a flowing blue dress stands slightly left of center on a narrow gravel path in a lush garden. Her body is turned gently toward the viewer, her shoulders relaxed and her hands resting loosely at her sides. The dress falls to her ankles, with soft folds gathering around the waist and a light breeze lifting the hem. Flowering rose bushes frame the path, their pink blossoms contrasting with the blue fabric and deep green foliage. Warm afternoon sunlight filters through nearby trees, casting patches of light across her dress and soft shadows onto the gravel. An eye-level, full-length composition keeps her clearly visible while the garden recedes into a softly detailed background.
+> beach, woman playing with dog, fisherboat in the distant, windy, blue hour, 35 mm photo
 
 #### Structured JSON output
 
-This is the editable `DRAFT_JSON` output before compilation. Connect the compiled `RESPONSE` output to MOSS Text Encode, and use the matching 1024 x 1024 canvas dimensions.
+The editable `DRAFT_JSON` output describes the scene and places each subject using absolute pixel coordinates. This example uses a **1920 x 1088** canvas.
 
 ```json
 {
-  "width": 1024,
-  "height": 1024,
+  "width": 1920,
+  "height": 1088,
   "bbox_coord_space": "abs",
   "bbox_format": "xyxy",
   "summary": {
-    "caption": "A woman in a flowing blue dress stands slightly left of center on a narrow gravel path in a lush garden. Her body is turned gently toward the viewer, her shoulders relaxed and her hands resting loosely at her sides. The dress falls to her ankles, with soft folds gathering around the waist and a light breeze lifting the hem. Flowering rose bushes frame the path, their pink blossoms contrasting with the blue fabric and deep green foliage. Warm afternoon sunlight filters through nearby trees, casting patches of light across her dress and soft shadows onto the gravel. An eye-level, full-length composition keeps her clearly visible while the garden recedes into a softly detailed background.",
-    "canvas": "single",
-    "palette": [
-      "soft blue",
-      "rose pink",
-      "deep green",
-      "warm gold"
-    ]
+    "caption": "A candid 35mm film photograph capturing a dynamic moment on a beach during the blue hour. In the foreground left, a woman in a light windbreaker laughs while interacting with a golden retriever that is leaping mid-air towards her. The wind is visibly strong, blowing their hair and the dog's fur to the right. The background features a calm ocean stretching to the horizon, where a small, dark silhouette of a fisherboat sits in the distance. The scene is bathed in cool blue ambient light with visible film grain.",
+    "meta": [
+      "35mm photography",
+      "blue hour",
+      "beach",
+      "windy",
+      "candid"
+    ],
+    "canvas": "single"
   },
   "items": [
     {
       "label": "character",
-      "caption": "A woman standing with her weight resting on one leg, her torso turned slightly toward the viewer and her expression calm. Her arms hang naturally, with relaxed fingers beside her hips. She wears an ankle-length blue dress with a softly fitted waist and a flowing skirt. Sunlight catches the raised fabric folds, while cooler blue shadows describe the drape. The hem moves gently in the breeze, leaving her feet visible on the gravel.",
-      "bbox": [290, 120, 610, 940]
+      "caption": "A woman with shoulder-length brown hair blown sharply to the right by the wind, wearing a light beige windbreaker and dark trousers. She is positioned on the wet sand in the left foreground, leaning slightly forward with her arms extended toward the dog, laughing with an open-mouthed expression. Her posture suggests active engagement, with one foot planted firmly and the other slightly lifted.",
+      "bbox": [
+        150,
+        350,
+        650,
+        1050
+      ]
+    },
+    {
+      "label": "character",
+      "caption": "A golden retriever captured mid-leap in the air, body angled upward and toward the woman. Its fur is ruffled by the wind, flowing to the right. The dog's front paws are extended forward as if reaching for a treat or toy held by the woman, while its hind legs are tucked slightly back. The expression is alert and playful.",
+      "bbox": [
+        450,
+        400,
+        950,
+        850
+      ]
     },
     {
       "label": "object",
-      "caption": "A flowering rose bush beside the left edge of the path, with overlapping dark green leaves and clusters of open pink blossoms. Sunlit petals have delicate translucent edges, while shaded branches create depth beneath the flowers.",
-      "bbox": [20, 380, 285, 920]
-    },
-    {
-      "label": "object",
-      "caption": "A taller rose bush framing the right side of the scene, with arching stems, dense green foliage and scattered pink flowers at different stages of bloom. Its uneven silhouette opens toward the central path, leaving the woman unobstructed.",
-      "bbox": [690, 280, 1000, 950]
+      "caption": "A small, dark silhouette of a traditional fisherboat floating on the calm ocean surface in the far distance. It is positioned near the horizon line, appearing as a simple, elongated shape with a faint mast, barely distinguishable from the twilight water.",
+      "bbox": [
+        1400,
+        580,
+        1600,
+        620
+      ]
     }
   ]
 }
 ```
+
+#### Enhanced prompt (compiled output)
+
+The `RESPONSE` output is the compiled MOSS-ready prompt. Connect it to MOSS Text Encode and use the same **1920 x 1088** canvas dimensions. The compiler converts the draft boxes into centered `yxyx` coordinates.
+
+```json
+{"summary":{"caption":"A candid 35mm film photograph capturing a dynamic moment on a beach during the blue hour. In the foreground left, a woman in a light windbreaker laughs while interacting with a golden retriever that is leaping mid-air towards her. The wind is visibly strong, blowing their hair and the dog's fur to the right. The background features a calm ocean stretching to the horizon, where a small, dark silhouette of a fisherboat sits in the distance. The scene is bathed in cool blue ambient light with visible film grain.","meta":["35mm photography","blue hour","beach","windy","candid"],"canvas":"single"},"items":[{"label":"character","caption":"A woman with shoulder-length brown hair blown sharply to the right by the wind, wearing a light beige windbreaker and dark trousers. She is positioned on the wet sand in the left foreground, leaning slightly forward with her arms extended toward the dog, laughing with an open-mouthed expression. Her posture suggests active engagement, with one foot planted firmly and the other slightly lifted.","bbox":[-194,-810,506,-310]},{"label":"character","caption":"A golden retriever captured mid-leap in the air, body angled upward and toward the woman. Its fur is ruffled by the wind, flowing to the right. The dog's front paws are extended forward as if reaching for a treat or toy held by the woman, while its hind legs are tucked slightly back. The expression is alert and playful.","bbox":[-144,-510,306,-10]},{"label":"object","caption":"A small, dark silhouette of a traditional fisherboat floating on the calm ocean surface in the far distance. It is positioned near the horizon line, appearing as a simple, elongated shape with a faint mast, barely distinguishable from the twilight water.","bbox":[36,440,76,640]}],"bbox_coord_space":"abs_centralized","bbox_format":"yxyx"}
+```
+
+#### Resulting image
+
+![A woman playing with a leaping golden retriever on a windy beach at blue hour, with a fishing boat in the distance](assets/beach-example.png)
 
 ## How It Works
 
